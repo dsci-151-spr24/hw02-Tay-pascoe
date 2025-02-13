@@ -59,7 +59,7 @@ library(fivethirtyeight)
 
 ## Data
 
-The data can be found in the **fivethirtyeight** package, and it's called `college_recent_grads`.
+The data can be found in the **fivethirtyeight** package, and it's called `college_recent_?grads`.
 Since the dataset is distributed with the package, we don't need to load it separately; it becomes available to us when we load the package.
 You can find out more about the dataset by inspecting its documentation, which you can access by running `?college_recent_grads` in the Console or using the Help menu in RStudio to search for `college_recent_grads`.
 You can also find this information [here](https://fivethirtyeight-r.netlify.app/reference/college_recent_grads.html).
@@ -90,8 +90,9 @@ By default `arrange` sorts in ascending order, which is what we want here -- we'
 
 ```{r lowest-unemp}
 college_recent_grads %>%
-  arrange(unemployment_rate)
+  arrange(desc(unemployment_rate))
 ```
+***The major with the lowest unemployment rate is Petrolium Engineering***
 
 This gives us what we wanted, but not in an ideal form.
 First, the name of the major barely fits on the page.
@@ -122,6 +123,9 @@ college_recent_grads %>%
   mutate(unemployment_rate = percent(unemployment_rate))
 ```
 
+***The major with the lowest unemployment rate is Mathematics and Computer Science ***
+
+
 ## Which major has the highest percentage of women?
 
 To answer such a question we need to arrange the data in descending order.
@@ -138,6 +142,15 @@ college_recent_grads %>%
 ```
 
 1.  Using what you've learned so far, arrange the data in descending order with respect to proportion of women in a major, and display only the major, the total number of people with major, and proportion of women. Show only the top 3 majors by adding `top_n(3)` at the end of the pipeline.
+
+***In descending order its psychology, biology, and Business managment and administractions***
+```{r}
+college_recent_grads %>%
+  arrange(desc(women)) %>%
+  select(major, women, total) %>%
+  top_n(3)
+```
+
 
 ## How do the distributions of median income compare across major categories?
 
@@ -173,8 +186,15 @@ Along with the plot, we get a message:
 This is telling us that we might want to reconsider the binwidth we chose for our histogram -- or more accurately, the binwidth we didn't specify.
 It's good practice to always think in the context of the data and try out a few binwidths before settling on a binwidth.
 You might ask yourself: "What would be a meaningful difference in median incomes?" \$1 is obviously too little, \$10000 might be too high.
+```{r}
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 1000)
+```
+
 
 3.  Try binwidths of \$1000 and \$5000 and choose one. Explain your reasoning for your choice. Note that the binwidth is an argument for the `geom_histogram` function. So to specify a binwidth of \$1000, you would use `geom_histogram(binwidth = 1000)`.
+
+***I chose the binwidth of 1000 because it better shows the data individually instead of a 5000 which grouped the data to much to be able to read as wel.***
 
 We can also calculate summary statistics for this distribution using the `summarise` function:
 
@@ -189,26 +209,40 @@ college_recent_grads %>%
 
 4.  Based on the shape of the histogram you created in the previous exercise, determine which of these summary statistics is useful for describing the distribution.
     Write up your description (remember shape, center, spread, any unusual observations) and include the summary statistic output as well.
+    
+***The median would be the best summary statistic to describe the distribution. I'm not sure how to answer the second part of this question.***
 
 5.  Plot the distribution of `median` income using a histogram, faceted by `major_category`.
     Use the `binwidth` you chose in the earlier exercise.
+```{r}
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 1000) + facet_wrap(~major_category)
+
+```
+  
 
 Now that we've seen the shapes of the distributions of median incomes for each major category, we should have a better idea for which summary statistic to use to quantify the typical median income.
 
 6.  Which major category has the highest typical (you'll need to decide what this means) median income? Use the partial code below, filling it in with the appropriate statistic and function. Also note that we are looking for the highest statistic, so make sure to arrange in the correct direction.
 
+***Engineering has the highest median income***
+
 ```{r eval=FALSE}
 college_recent_grads %>%
   group_by(major_category) %>%
-  summarise(___ = ___(median)) %>%
-  arrange(___)
+  summarise(min = min(median), max = max(median),
+            mean = mean(median), med = median(median)) %>%
+  arrange(desc(med))
 ```
 
 7.  Which major category is the least popular in this sample? To answer this question we use a new function called `count`, which first groups the data and then counts the number of observations in each category (see below). Add to the pipeline appropriately to arrange the results so that the major with the lowest observations is on top.
 
+***the least popular major is agriculture and natural resources***
+
 ```{r}
 college_recent_grads %>%
-  count(major_category)
+  count(major_category) %>%
+arrange(major_category)
 ```
 
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
