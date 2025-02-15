@@ -7,11 +7,13 @@ output:
     tufte_variant: "envisioned"
     highlight: pygments
 link-citations: true
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r include = FALSE}
 knitr::opts_chunk$set(
-  eval = FALSE,
+  eval = TRUE,
   out.width = "80%",
   fig.asp = 0.618,
   fig.width = 10,
@@ -174,7 +176,7 @@ The first argument is the data frame, and the next argument gives the mapping of
 
 Let's start simple and take a look at the distribution of all median incomes, without considering the major categories.
 
-```{r fig,height=2}
+```{r height=2}
 ggplot(data = college_recent_grads, mapping = aes(x = median)) +
   geom_histogram()
 ```
@@ -298,6 +300,16 @@ college_recent_grads %>%
 
 8.  Which STEM majors have median salaries equal to or less than the median for all majors' median earnings? Your output should only show the major name and median, 25th percentile, and 75th percentile earning for that major as and should be sorted such that the major with the highest median earning is on top.
 
+```{r}
+college_recent_grads %>%
+  filter(
+    major_type == "stem",
+    median >= 0.25 & 0.75) %>%
+  select(major, median)%>%
+arrange (median(major))
+
+```
+            
 🧶 ✅ ⬆️ Knit, *commit, and push your changes to GitHub with an appropriate commit message. Make sure to commit and push all changed files so that your Git pane is cleared up afterwards.*
 
 ## What types of majors do women tend to major in?
